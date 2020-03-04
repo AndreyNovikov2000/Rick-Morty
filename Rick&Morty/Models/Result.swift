@@ -6,7 +6,7 @@
 //  Copyright © 2019 Andrey Novikov. All rights reserved.
 //
 
-struct Result: Decodable {
+struct Result: Decodable, Encodable {
     let id: Int
     let name: String
     let status: String
@@ -17,10 +17,10 @@ struct Result: Decodable {
     let image: String
 }
 
-struct Origin: Decodable {
+struct Origin: Decodable, Encodable {
     let name: String
 }
 
-struct Location: Decodable {
+struct Location: Decodable, Encodable {
     let name: String
 }

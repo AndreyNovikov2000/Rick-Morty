@@ -15,7 +15,7 @@ class ChracterTableViewController: UITableViewController {
     let networkFetcher = NetworkFetcher()
     
     //MARK: Private properties
-    private let urlString = "https://rickandmortyapi.com/api/character"
+    private let urlString = CHRACTER_URL
     private let searchController = UISearchController(searchResultsController: nil)
     private var filteredChracter = [Result]()
     private var searchBarIsEmpty: Bool {
@@ -25,6 +25,7 @@ class ChracterTableViewController: UITableViewController {
     private var isFiltering: Bool {
         return searchController.isActive && !searchBarIsEmpty
     }
+    private var isConnecting: Bool!
     
     // MARK: - UIViewController Methods
     
@@ -33,11 +34,8 @@ class ChracterTableViewController: UITableViewController {
         
         title = "Rick&Morty"
         tableView.backgroundColor = .black
+        getCharacter()
         setupSearchController()
-        networkFetcher.fetchChracrter(urlsString: urlString) { (result) in
-            self.chracter = result
-            self.tableView.reloadData()
-        }
     }
     
     // MARK: - Table view data source
@@ -51,8 +49,12 @@ class ChracterTableViewController: UITableViewController {
         
         let result = isFiltering ? filteredChracter[indexPath.row] : chracter?.results[indexPath.row]
         
-        cell.configure(with: result)
-    
+        if isConnecting {
+            cell.configure(with: result)
+        } else {
+            cell.configureWithUserDefaults(witf: result, indexPath: indexPath)
+        }
+        
         return cell
     }
     
@@ -80,6 +82,27 @@ class ChracterTableViewController: UITableViewController {
         if let textField = searchController.searchBar.value(forKey: "searchField") as? UITextField {
             textField.font = UIFont.boldSystemFont(ofSize: 17)
             textField.textColor = .white
+        }
+    }
+    
+    private func getCharacter() {
+        
+        networkFetcher.fetchChracrter(urlsString: urlString) { (result, response)  in
+            
+            self.chracter = result
+            self.isConnecting = true
+            self.tableView.reloadData()
+        }
+        
+        // IF INTERNET CONNECTION NOT AVAILABLE
+        Reachability.shared.isConnectedToNetwork { (connection) in
+            DispatchQueue.main.async {
+                if !connection {
+                    self.chracter = StorageManager.shared.fetchChracter()
+                    self.isConnecting = false
+                    self.tableView.reloadData()
+                }
+            }
         }
     }
 }

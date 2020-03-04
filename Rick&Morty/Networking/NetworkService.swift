@@ -9,18 +9,19 @@
 import Foundation
 
 class NetworkService {
-    func request(urlString: String, complition: @escaping ((Data?, Error?) -> ())) {
+    func request(urlString: String, complition: @escaping ((Data?, URLResponse?, Error?) -> ())) {
         guard let url = URL(string: urlString) else { return }
         
-        URLSession.shared.dataTask(with: url) { (data, _, error) in
+        URLSession.shared.dataTask(with: url) { (data, response, error) in
             DispatchQueue.main.async {
                 if let error = error {
                     print(error.localizedDescription)
-                    complition(nil, error)
+                    complition(nil, nil, error)
                     return
                 }
-                guard let data = data else { return }
-                complition(data, nil)
+                
+                guard let data = data, let response = response else { return }
+                complition(data, response, nil)
             }
         }.resume()
     }

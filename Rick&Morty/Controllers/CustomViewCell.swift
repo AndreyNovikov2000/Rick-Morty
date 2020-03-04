@@ -31,6 +31,8 @@ class CustomViewCell: UITableViewCell {
         }
     }
     
+    private let networkF = NetworkFetcher()
+    
     // MARK: - Public methods
     func configure(with result: Result?) {
         nameLabel.text = result?.name
@@ -40,6 +42,16 @@ class CustomViewCell: UITableViewCell {
             guard let imageData = try? Data(contentsOf: imageUrl) else { return }
             DispatchQueue.main.async {
                 self.chracterImageView.image = UIImage(data: imageData)
+            }
+        }
+    }
+    
+    func configureWithUserDefaults(witf result: Result?, indexPath: IndexPath) {
+        nameLabel.text = result?.name
+        DispatchQueue.global().async {
+            DispatchQueue.main.async {
+                self.chracterImageView.image = UIImage(data: self.networkF.imageData[indexPath.row])
+                
             }
         }
     }

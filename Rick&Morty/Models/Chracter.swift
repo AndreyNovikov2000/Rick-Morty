@@ -6,7 +6,7 @@
 //  Copyright © 2019 Andrey Novikov. All rights reserved.
 //
 
-struct Chracter: Decodable {
+struct Chracter: Decodable, Encodable {
     let results: [Result]
 }
 
